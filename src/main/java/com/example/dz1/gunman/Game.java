@@ -29,22 +29,21 @@ public class Game extends Group {
     }
     public void onMouseEvent(MouseEvent mouseEvent) {
         this.mouse = this.parentToLocal(mouseEvent.getX(), mouseEvent.getY());
-        if (player != null) player.adjustRotate(mouse);
+        player.adjustRotate(mouse);
 
         if (mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
             player.fire();
         }
     }
     public void onKeyEvent(KeyEvent keyEvent) {
-        if (player != null) {
-            switch (keyEvent.getCode()) {
-                case UP -> player.moveBy(new Point2D(0, -1));
-                case DOWN -> player.moveBy(new Point2D(0, 1));
-                case LEFT -> player.moveBy(new Point2D(-1, 0));
-                case RIGHT -> player.moveBy(new Point2D(1, 0));
-            }
-            player.adjustRotate(mouse);
+        switch (keyEvent.getCode()) {
+            case UP -> player.moveBy(new Point2D(0, -1));
+            case DOWN -> player.moveBy(new Point2D(0, 1));
+            case LEFT -> player.moveBy(new Point2D(-1, 0));
+            case RIGHT -> player.moveBy(new Point2D(1, 0));
         }
+        player.adjustRotate(mouse);
+        for (Enemy enemy: enemies) enemy.adjustRotate(player);
     }
 
     public Field getField() {
@@ -73,6 +72,7 @@ public class Game extends Group {
     public void addEnemy(Enemy enemy) {
         this.getChildren().addAll(enemy);
         enemies.add(enemy);
+        enemy.adjustRotate(player);
     }
     public List<Bullet> getBullets() {
         return bullets;
@@ -108,12 +108,20 @@ public class Game extends Group {
             else {
                 Iterator<Enemy> enemyIter = enemies.iterator();
                 Wrapper<Boolean> removed = new Wrapper<>(false);
+                Runnable bulletRemover = () -> {
+                    bulletIter.remove();
+                    getChildren().remove(bullet);
+                    removed.value = true;
+                };
                 while(enemyIter.hasNext()) {
                     Enemy enemy = enemyIter.next();
-                    enemy.interact(bullet, () -> {bulletIter.remove(); removed.value = true;}, enemyIter::remove);
+                    enemy.interact(bullet, bulletRemover, () -> {
+                        enemyIter.remove();
+                        getChildren().remove(enemy);
+                    });
                     if (removed.value) break;
                 }
-                if (!removed.value) player.interact(bullet, bulletIter::remove, () -> {
+                if (!removed.value) player.interact(bullet, bulletRemover, () -> {
                     //Game over?
                 });
             }

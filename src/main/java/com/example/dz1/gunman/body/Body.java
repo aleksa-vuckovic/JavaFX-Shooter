@@ -20,6 +20,9 @@ public abstract class Body extends Group {
     public void setFill(Paint paint) {
         shape.setFill(paint);
     }
+    public Paint getFill() {
+        return shape.getFill();
+    }
     public void setStroke(Paint paint) {
         shape.setStroke(paint);
         shape.setStrokeWidth(0.01f);

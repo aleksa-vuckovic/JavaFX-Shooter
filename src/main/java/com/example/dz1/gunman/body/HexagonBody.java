@@ -9,13 +9,15 @@ import javafx.scene.shape.Polygon;
 public class HexagonBody extends Body {
 
     public HexagonBody() {
+        float t = 1f/2;
+        float h = (float)Math.sqrt(3)/2;
         shape = new Polygon(
-                0.4f, -1f,
+                t, -h,
                 1f, 0f,
-                0.4f, 1f,
-                -0.4f, 1f,
+                t, h,
+                -t, h,
                 -1f, 0f,
-                -0.4f, -1f
+                -t, -h
         );
         this.getChildren().addAll(shape);
     }
