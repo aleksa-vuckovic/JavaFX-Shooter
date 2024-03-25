@@ -1,0 +1,17 @@
+package com.example.dz1.gunman;
+
+import com.example.dz1.gunman.body.Body;
+import com.example.dz1.gunman.gun.Gun;
+import javafx.geometry.Point2D;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+
+public class Player extends Gunman {
+
+    private static final float SPEED = 5f;
+
+    public Player(Body body, Gun gun, float radius, Game game) {
+        super(body, gun, radius, game);
+    }
+
+}
