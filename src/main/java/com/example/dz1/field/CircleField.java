@@ -17,15 +17,9 @@ public class CircleField extends Field {
     }
 
     @Override
-    public boolean isWithinBounds(Gunman gunman) {
-        Bounds gunmanBounds = gunman.getBodyBounds();
-        try {
-            gunmanBounds = this.getLocalToParentTransform().inverseTransform(gunmanBounds);
-        } catch(NonInvertibleTransformException ignored) {}
-
-        for (Point2D corner: Utils.getCorners(gunmanBounds))
-            if (!circle.contains(corner)) return false;
-        return true;
+    public boolean isWithinBounds(Point2D point) {
+        point = this.parentToLocal(point);
+        return circle.contains(point);
     }
 
     @Override

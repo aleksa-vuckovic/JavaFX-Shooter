@@ -1,31 +1,39 @@
 package com.example.dz1.gunman;
 
+import com.example.dz1.Wrapper;
 import com.example.dz1.field.Field;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Game extends Group {
 
+    private Field field;
     private Player player;
     private List<Enemy> enemies = new ArrayList<>();
-    private Field field;
+    private List<Bullet> bullets = new LinkedList<>();
+    private Bounds gameBounds;
 
-    private double mouseX = 0;
-    private double mouseY = 0;
+    private Point2D mouse = Point2D.ZERO;
 
-    public Game() {
-        this.addEventHandler(MouseEvent.ANY, mouseEvent -> {
-            mouseX = mouseEvent.getX();
-            mouseY = mouseEvent.getY();
-            if (player != null) player.adjustRotate(new Point2D(mouseX,mouseY));
-        });
+    public Game(float sceneWidth, float sceneHeight) {
+        this.gameBounds = new Rectangle(-sceneWidth/2, -sceneHeight/2, sceneWidth, sceneHeight).getBoundsInLocal();
+    }
+    public void onMouseEvent(MouseEvent mouseEvent) {
+        this.mouse = this.parentToLocal(mouseEvent.getX(), mouseEvent.getY());
+        if (player != null) player.adjustRotate(mouse);
+
+        if (mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
+            player.fire();
+        }
     }
     public void onKeyEvent(KeyEvent keyEvent) {
         if (player != null) {
@@ -35,10 +43,18 @@ public class Game extends Group {
                 case LEFT -> player.moveBy(new Point2D(-1, 0));
                 case RIGHT -> player.moveBy(new Point2D(1, 0));
             }
-            player.adjustRotate(new Point2D(mouseX, mouseY));
+            player.adjustRotate(mouse);
         }
     }
 
+    public Field getField() {
+        return field;
+    }
+    public void setField(Field field) {
+        this.getChildren().remove(field);
+        this.getChildren().add(field);
+        this.field = field;
+    }
     public Player getPlayer() {
         return player;
     }
@@ -58,13 +74,50 @@ public class Game extends Group {
         this.getChildren().addAll(enemy);
         enemies.add(enemy);
     }
-    public Field getField() {
-        return field;
+    public List<Bullet> getBullets() {
+        return bullets;
     }
-    public void setField(Field field) {
-        this.getChildren().remove(field);
-        this.getChildren().add(field);
-        this.field = field;
+    public void addBullet(Bullet bullet) {
+        this.getChildren().add(bullet);
+        bullets.add(bullet);
+    }
+    /*
+    public void removeBullet(Bullet bullet) {
+        this.getChildren().remove(bullet);
+        bullets.remove(bullet);
+    }
+    */
+
+    /**
+     * Checks whether the given bounds are entirely outside the bounds of the game (scene).
+     * @param bounds The bounds in game coordinates.
+     */
+    public boolean isOutside(Bounds bounds) {
+        return !this.gameBounds.intersects(bounds);
+    }
+
+    public void timeUpdate(long interval) {
+        Iterator<Bullet> bulletIter = bullets.iterator();
+        while (bulletIter.hasNext()) {
+            Bullet bullet = bulletIter.next();
+            bullet.timeUpdate(interval);
+            if (isOutside(bullet.getBoundsInParent())) {
+                bulletIter.remove();
+                this.getChildren().remove(bullet);
+            }
+            else {
+                Iterator<Enemy> enemyIter = enemies.iterator();
+                Wrapper<Boolean> removed = new Wrapper<>(false);
+                while(enemyIter.hasNext()) {
+                    Enemy enemy = enemyIter.next();
+                    enemy.interact(bullet, () -> {bulletIter.remove(); removed.value = true;}, enemyIter::remove);
+                    if (removed.value) break;
+                }
+                if (!removed.value) player.interact(bullet, bulletIter::remove, () -> {
+                    //Game over?
+                });
+            }
+        }
     }
 
 }

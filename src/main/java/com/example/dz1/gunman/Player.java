@@ -14,4 +14,11 @@ public class Player extends Gunman {
         super(body, gun, radius, game);
     }
 
+    @Override
+    public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
+        if (!super.interact(bullet, onRemoveBullet, onRemoveGunman)) return false;
+        onRemoveBullet.run();
+        return true;
+    }
+
 }

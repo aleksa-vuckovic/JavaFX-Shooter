@@ -9,12 +9,14 @@ import com.example.dz1.gunman.body.CircleBody;
 import com.example.dz1.gunman.body.HexagonBody;
 import com.example.dz1.gunman.gun.Gun;
 import com.example.dz1.gunman.gun.RegularGun;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.transform.Translate;
@@ -29,7 +31,7 @@ public class HelloApplication extends Application {
     private static final float PLAYER_RADIUS = 20f;
     @Override
     public void start(Stage stage) throws IOException {
-        Game game = new Game();
+        Game game = new Game(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Field field = new CircleField(WINDOW_WIDTH/3);
         Image grassImage = new Image("grass.jpg");
@@ -47,8 +49,20 @@ public class HelloApplication extends Application {
         game.setPlayer(player);
         game.getTransforms().add(new Translate(WINDOW_WIDTH/2, WINDOW_HEIGHT/2));
 
+        AnimationTimer timer = new AnimationTimer() {
+            long prev = 0;
+            @Override
+            public void handle(long now) {
+                now /= 1000;
+                if (prev != 0) game.timeUpdate(now - prev);
+                prev = now;
+            }
+        };
+        timer.start();
+
         Scene scene = new Scene(game, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.addEventHandler(KeyEvent.ANY, game::onKeyEvent);
+        scene.addEventHandler(MouseEvent.ANY, game::onMouseEvent);
         Image waterImage = new Image("water.jpg");
         ImagePattern waterPattern = new ImagePattern(waterImage);
         scene.setFill(waterPattern);

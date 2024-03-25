@@ -5,6 +5,7 @@ import com.example.dz1.gunman.gun.Gun;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
@@ -42,7 +43,7 @@ public abstract class Gunman extends Group {
     }
 
     public Point2D getCenter() {
-        return this.getLocalToParentTransform().transform(0f, 0f);
+        return this.localToParent(0f, 0f);
     }
     public float getRadius() {
         return this.radius;
@@ -70,7 +71,7 @@ public abstract class Gunman extends Group {
      * @return The body bounds in game coordinates.
      */
     public Bounds getBodyBounds() {
-        return getLocalToParentTransform().transform(body.getBoundsInLocal());
+        return localToParent(body.getBoundsInLocal());
     }
 
     /**
@@ -79,9 +80,11 @@ public abstract class Gunman extends Group {
      * @param amount The displacement vector.
      */
     public void moveBy(Point2D amount) {
-        if (game.getField().isWithinBounds(this)) {
-            this.position.setX(this.position.getX() + amount.getX()*speed);
-            this.position.setY(this.position.getY() + amount.getY()*speed);
+        this.position.setX(this.position.getX() + amount.getX()*speed);
+        this.position.setY(this.position.getY() + amount.getY()*speed);
+        if (!game.getField().isWithinBounds(this)) {
+            this.position.setX(this.position.getX() - amount.getX()*speed);
+            this.position.setY(this.position.getY() - amount.getY()*speed);
         }
     }
 
@@ -92,5 +95,24 @@ public abstract class Gunman extends Group {
     public void moveTo(Point2D position) {
         this.position.setX(position.getX());
         this.position.setY(position.getY());
+    }
+
+    /**
+     * Fire a bullet.
+     */
+    public void fire() {
+        Point2D direction = rotate.transform(1, 0);
+        Point2D position = localToParent(this.gun.getTop());
+        Bullet bullet = Bullet.regularBullet(position, direction);
+        game.addBullet(bullet);
+    }
+
+    /**
+     * @return True if an interaction occurred.
+     */
+    public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
+        Point2D bulletPosition = parentToLocal(bullet.getPosition());
+        float bulletRadius = bullet.getRadius() / radius;
+        return body.intersectsCircle(bulletPosition, bulletRadius);
     }
 }

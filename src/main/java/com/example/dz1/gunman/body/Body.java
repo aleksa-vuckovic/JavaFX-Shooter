@@ -1,5 +1,8 @@
 package com.example.dz1.gunman.body;
 
+import com.example.dz1.Utils;
+import com.example.dz1.gunman.Bullet;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Paint;
@@ -11,14 +14,7 @@ import javafx.scene.shape.Shape;
 public abstract class Body extends Group {
 
     protected Shape shape;
-
-    /**
-     * @param point A point given in the local coordinate system.
-     * @return True if the point is inside the body (or on the edge).
-     */
-    public boolean contains(Point2D point) {
-        return shape.contains(point);
-    }
+    public abstract boolean intersectsCircle(Point2D center, float radius);
 
 
     public void setFill(Paint paint) {
