@@ -1,10 +1,8 @@
 package com.example.dz1.gunman;
 
+import com.example.dz1.Game;
 import com.example.dz1.gunman.body.Body;
 import com.example.dz1.gunman.gun.Gun;
-import javafx.geometry.Point2D;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 
 public class Player extends Gunman {
 
@@ -19,6 +17,16 @@ public class Player extends Gunman {
         if (!super.interact(bullet, onRemoveBullet, onRemoveGunman)) return false;
         onRemoveBullet.run();
         return true;
+    }
+
+
+    @Override
+    public void fire() {
+        super.fireBullet(Bullet.regularBullet());
+    }
+
+    public void fireBig() {
+        super.fireBullet(Bullet.bigBullet());
     }
 
 }

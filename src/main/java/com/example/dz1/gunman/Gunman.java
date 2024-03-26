@@ -1,14 +1,16 @@
 package com.example.dz1.gunman;
 
+import com.example.dz1.Game;
 import com.example.dz1.gunman.body.Body;
 import com.example.dz1.gunman.gun.Gun;
+import javafx.animation.*;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
+import javafx.util.Duration;
 
 /**
  * This class represents an actor with a gun, with a specified size,
@@ -23,6 +25,7 @@ public abstract class Gunman extends Group {
     protected Gun gun;
     protected Game game;
     protected float speed;
+    private Timeline triggerTimeline;
 
     Gunman(Body body, Gun gun, float radius, Game game) {
         this.body = body;
@@ -31,8 +34,20 @@ public abstract class Gunman extends Group {
         this.game = game;
         this.speed = 10;
 
+        Translate triggerTranslate = new Translate();
+
+        KeyValue kv1 = new KeyValue(triggerTranslate.xProperty(), -0.4, Interpolator.LINEAR);
+        KeyFrame kf1 = new KeyFrame(Duration.seconds(0.1), kv1);
+        KeyValue kv2 = new KeyValue(triggerTranslate.xProperty(), 0, Interpolator.LINEAR);
+        KeyFrame kf2 = new KeyFrame(Duration.seconds(0.2), kv2);
+        triggerTimeline = new Timeline(kf1, kf2);
+
         this.getChildren().addAll(body, gun);
-        this.getTransforms().addAll(position, rotate, new Scale(radius, radius));
+        this.getTransforms().addAll(position, rotate, new Scale(radius, radius), triggerTranslate);
+    }
+
+    protected void trigger() {
+        triggerTimeline.play();
     }
 
     public float getSpeed() {
@@ -97,15 +112,13 @@ public abstract class Gunman extends Group {
         this.position.setY(position.getY());
     }
 
-    /**
-     * Fire a bullet.
-     */
-    public void fire() {
-        Point2D direction = rotate.transform(1, 0);
-        Point2D position = localToParent(this.gun.getTop());
-        Bullet bullet = Bullet.regularBullet(position, direction);
+
+    protected final void fireBullet(Bullet bullet) {
+        bullet.setDirection(rotate.transform(1, 0));
+        bullet.setPosition(localToParent(this.gun.getTop()));
         game.addBullet(bullet);
     }
+    public abstract void fire();
 
     /**
      * @return True if an interaction occurred.

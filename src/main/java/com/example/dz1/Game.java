@@ -1,11 +1,16 @@
-package com.example.dz1.gunman;
+package com.example.dz1;
 
 import com.example.dz1.Wrapper;
 import com.example.dz1.field.Field;
+import com.example.dz1.gunman.Bullet;
+import com.example.dz1.gunman.Enemy;
+import com.example.dz1.gunman.Player;
+import com.example.dz1.indicators.BulletIndicator;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 
@@ -21,6 +26,7 @@ public class Game extends Group {
     private List<Enemy> enemies = new ArrayList<>();
     private List<Bullet> bullets = new LinkedList<>();
     private Bounds gameBounds;
+    private BulletIndicator bulletIndicator;
 
     private Point2D mouse = Point2D.ZERO;
 
@@ -32,7 +38,10 @@ public class Game extends Group {
         player.adjustRotate(mouse);
 
         if (mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
-            player.fire();
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                if (bulletIndicator.dec()) player.fireBig();
+            }
+            else player.fire();
         }
     }
     public void onKeyEvent(KeyEvent keyEvent) {
@@ -53,6 +62,11 @@ public class Game extends Group {
         this.getChildren().remove(field);
         this.getChildren().add(field);
         this.field = field;
+    }
+    public void setBulletIndicator(BulletIndicator bulletIndicator) {
+        this.getChildren().remove(this.bulletIndicator);
+        this.bulletIndicator = bulletIndicator;
+        this.getChildren().add(bulletIndicator);
     }
     public Player getPlayer() {
         return player;

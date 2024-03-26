@@ -19,20 +19,33 @@ public class Bullet extends Group {
      */
     private float speed;
 
-    public Bullet(float radius, int damage, Point2D position, Point2D direction, float speed, Paint fill) {
+    public Bullet(float radius, int damage, float speed, Paint fill) {
         this.radius = radius;
         this.damage = damage;
-        this.position = new Translate(position.getX(), position.getY());
-        this.direction = direction.normalize();
         this.speed = speed;
+        this.position = new Translate(-10000,-10000);
+        this.direction = Point2D.ZERO;
 
         circle = new Circle(radius);
         circle.setFill(fill);
         this.getChildren().addAll(circle);
         this.getTransforms().add(this.position);
     }
-    public static Bullet regularBullet(Point2D position, Point2D direction) {
-        return new Bullet(5f, 1, position, direction, 0.001f, Color.BLACK);
+    public void setPosition(Point2D position) {
+        this.position.setX(position.getX());
+        this.position.setY(position.getY());
+    }
+    public void setDirection(Point2D direction) {
+        this.direction = direction.normalize();
+    }
+    public static Bullet regularBullet() {
+        return new Bullet(5f, 1, 1f, Color.BLACK);
+    }
+    public static Bullet slowBullet() {
+        return new Bullet(5f, 1, 0.2f, Color.BLACK);
+    }
+    public static Bullet bigBullet() {
+        return new Bullet(10f, 2, 0.2f, Color.RED);
     }
 
     public void timeUpdate(long interval) {

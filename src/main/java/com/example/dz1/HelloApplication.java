@@ -3,17 +3,14 @@ package com.example.dz1;
 import com.example.dz1.field.CircleField;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Enemy;
-import com.example.dz1.gunman.Game;
 import com.example.dz1.gunman.Player;
 import com.example.dz1.gunman.body.Body;
-import com.example.dz1.gunman.body.CircleBody;
 import com.example.dz1.gunman.body.HexagonBody;
 import com.example.dz1.gunman.gun.Gun;
 import com.example.dz1.gunman.gun.RegularGun;
-import javafx.animation.AnimationTimer;
+import com.example.dz1.indicators.BulletIndicator;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -50,6 +47,10 @@ public class HelloApplication extends Application {
         Player player = new Player(playerBody, playerGun, PLAYER_RADIUS, game);
         game.setPlayer(player);
 
+        BulletIndicator bulletIndicator = new BulletIndicator(4);
+        bulletIndicator.setPosition(new Point2D(WINDOW_WIDTH/2, -WINDOW_HEIGHT/2));
+        game.setBulletIndicator(bulletIndicator);
+
         for (int i = 0; i < ENEMY_COUNT; i++) {
             double angle = (double)i/ENEMY_COUNT*360;
             Point2D position = new Rotate(angle).transform(WINDOW_WIDTH*5/12, 0);
@@ -60,16 +61,12 @@ public class HelloApplication extends Application {
 
         game.getTransforms().add(new Translate(WINDOW_WIDTH/2, WINDOW_HEIGHT/2));
 
-        AnimationTimer timer = new AnimationTimer() {
-            long prev = 0;
+        new IntervalTimer() {
             @Override
-            public void handle(long now) {
-                now /= 1000;
-                if (prev != 0) game.timeUpdate(now - prev);
-                prev = now;
+            public void handleInterval(long interval) {
+                game.timeUpdate(interval);
             }
-        };
-        timer.start();
+        }.start();
 
         Scene scene = new Scene(game, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.addEventHandler(KeyEvent.ANY, game::onKeyEvent);
