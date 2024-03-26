@@ -121,6 +121,9 @@ public abstract class Gunman extends Group {
     public abstract void fire();
 
     /**
+     * The base method checks for interaction.
+     * Overriding methods are expected to add specific behaviour
+     * if the base method returns true.
      * @return True if an interaction occurred.
      */
     public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {

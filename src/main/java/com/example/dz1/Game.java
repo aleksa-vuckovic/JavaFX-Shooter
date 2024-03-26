@@ -6,18 +6,20 @@ import com.example.dz1.gunman.Bullet;
 import com.example.dz1.gunman.Enemy;
 import com.example.dz1.gunman.Player;
 import com.example.dz1.indicators.BulletIndicator;
+import com.example.dz1.indicators.LivesIndicator;
+import com.example.dz1.indicators.TimeIndicator;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Game extends Group {
 
@@ -26,7 +28,13 @@ public class Game extends Group {
     private List<Enemy> enemies = new ArrayList<>();
     private List<Bullet> bullets = new LinkedList<>();
     private Bounds gameBounds;
-    private BulletIndicator bulletIndicator;
+    private TimeIndicator timeIndicator;
+
+    enum State {
+        PLAYING,
+        OVER
+    }
+    private State state = State.PLAYING;
 
     private Point2D mouse = Point2D.ZERO;
 
@@ -34,17 +42,17 @@ public class Game extends Group {
         this.gameBounds = new Rectangle(-sceneWidth/2, -sceneHeight/2, sceneWidth, sceneHeight).getBoundsInLocal();
     }
     public void onMouseEvent(MouseEvent mouseEvent) {
+        if (state != State.PLAYING) return;
         this.mouse = this.parentToLocal(mouseEvent.getX(), mouseEvent.getY());
         player.adjustRotate(mouse);
 
         if (mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
-            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                if (bulletIndicator.dec()) player.fireBig();
-            }
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) player.fireBig();
             else player.fire();
         }
     }
     public void onKeyEvent(KeyEvent keyEvent) {
+        if (state != State.PLAYING) return;
         switch (keyEvent.getCode()) {
             case UP -> player.moveBy(new Point2D(0, -1));
             case DOWN -> player.moveBy(new Point2D(0, 1));
@@ -63,18 +71,26 @@ public class Game extends Group {
         this.getChildren().add(field);
         this.field = field;
     }
-    public void setBulletIndicator(BulletIndicator bulletIndicator) {
-        this.getChildren().remove(this.bulletIndicator);
-        this.bulletIndicator = bulletIndicator;
-        this.getChildren().add(bulletIndicator);
+    public void setTimeIndicator(TimeIndicator timeIndicator) {
+        this.getChildren().remove(this.timeIndicator);
+        this.timeIndicator = timeIndicator;
+        this.getChildren().add(timeIndicator);
     }
     public Player getPlayer() {
         return player;
     }
     public void setPlayer(Player player) {
-        this.getChildren().remove(this.player);
-        this.getChildren().add(player);
+        if (this.player != null) {
+            this.getChildren().remove(this.player);
+            this.getChildren().remove(this.player.getBulletIndicator());
+            this.getChildren().remove(this.player.getLivesIndicator());
+        }
+        BulletIndicator bulletIndicator = player.getBulletIndicator();
+        bulletIndicator.setPosition(Utils.getUpperLeft(gameBounds));
+        LivesIndicator livesIndicator = player.getLivesIndicator();
+        livesIndicator.setPosition(Utils.getLowerLeft(gameBounds));
         this.player = player;
+        this.getChildren().addAll(player, bulletIndicator, livesIndicator);
     }
     public List<Enemy> getEnemies() {
         return enemies;
@@ -111,6 +127,7 @@ public class Game extends Group {
     }
 
     public void timeUpdate(long interval) {
+        if (state != State.PLAYING) return;
         Iterator<Bullet> bulletIter = bullets.iterator();
         while (bulletIter.hasNext()) {
             Bullet bullet = bulletIter.next();
@@ -135,11 +152,23 @@ public class Game extends Group {
                     });
                     if (removed.value) break;
                 }
-                if (!removed.value) player.interact(bullet, bulletRemover, () -> {
-                    //Game over?
-                });
+                if (!removed.value) player.interact(bullet, bulletRemover, this::over);
             }
         }
+    }
+
+    public void over() {
+        if (state != State.PLAYING) return;
+        state = State.OVER;
+        for (Enemy enemy: enemies) enemy.die();
+        timeIndicator.stop();
+        Text text = new Text("GAME OVER");
+        text.setFont(Font.font("Arial", 70));
+        text.setTranslateX(-text.getBoundsInLocal().getCenterX());
+        text.setTranslateY(-text.getBoundsInLocal().getCenterY());
+        Rectangle cover = new Rectangle(gameBounds.getMinX(), gameBounds.getMinY(), gameBounds.getWidth(), gameBounds.getHeight());
+        cover.setFill(Utils.changeOpacity(Color.WHITE, 0.5f));
+        getChildren().addAll(cover, text);
     }
 
 }

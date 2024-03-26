@@ -12,20 +12,20 @@ import javafx.scene.paint.Paint;
 
 public class Enemy extends Gunman {
 
-    private int lives;
-    private int maxLives;
     /**
      * Number of bullets fired per second.
      */
     private float fireFrequency;
     private IntervalTimer fireTimer;
 
+    protected int maxLives;
+    protected int lives;
+
 
     public Enemy(Body body, Gun gun, float radius, int lives, float fireFrequency, Game game) {
         super(body, gun, radius, game);
-        this.lives = lives;
-        this.maxLives = lives;
         this.fireFrequency = fireFrequency;
+        this.maxLives = this.lives = lives;
 
         this.fireTimer = new IntervalTimer() {
             @Override
@@ -43,7 +43,7 @@ public class Enemy extends Gunman {
         body.setStroke(Color.PURPLE);
         Gun gun = new ConeGun();
         gun.setFill(Color.PURPLE);
-        return new Enemy(body, gun, 20f, 4, 0.2f, game);
+        return new Enemy(body, gun, 20f, 4, 0.1f, game);
     }
 
     @Override
@@ -68,5 +68,9 @@ public class Enemy extends Gunman {
     public void fire() {
         super.fireBullet(Bullet.slowBullet());
         super.trigger();
+    }
+
+    public void die() {
+        fireTimer.stop();
     }
 }

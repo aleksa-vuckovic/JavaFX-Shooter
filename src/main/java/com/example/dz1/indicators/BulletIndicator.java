@@ -10,8 +10,8 @@ public class BulletIndicator extends Group {
     private static float R = 10f;
     private static float PAD = 10f;
 
-    int max;
-    int count;
+    private int max;
+    private int count;
     public BulletIndicator(int max) {
         this.max = max;
         this.count = 0;

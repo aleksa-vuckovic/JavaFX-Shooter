@@ -9,17 +9,24 @@ import com.example.dz1.gunman.body.HexagonBody;
 import com.example.dz1.gunman.gun.Gun;
 import com.example.dz1.gunman.gun.RegularGun;
 import com.example.dz1.indicators.BulletIndicator;
+import com.example.dz1.indicators.TimeIndicator;
+import javafx.animation.ScaleTransition;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -29,6 +36,8 @@ public class HelloApplication extends Application {
     private static final float WINDOW_HEIGHT = 600f;
     private static final float PLAYER_RADIUS = 20f;
     private static final int ENEMY_COUNT = 4;
+
+
     @Override
     public void start(Stage stage) throws IOException {
         Game game = new Game(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -44,12 +53,13 @@ public class HelloApplication extends Application {
         playerBody.setStroke(Color.PURPLE);
         Gun playerGun = new RegularGun();
         playerGun.setFill(Color.PURPLE);
-        Player player = new Player(playerBody, playerGun, PLAYER_RADIUS, game);
+        Player player = new Player(playerBody, playerGun, PLAYER_RADIUS, 4, 4, game);
         game.setPlayer(player);
 
-        BulletIndicator bulletIndicator = new BulletIndicator(4);
-        bulletIndicator.setPosition(new Point2D(WINDOW_WIDTH/2, -WINDOW_HEIGHT/2));
-        game.setBulletIndicator(bulletIndicator);
+        TimeIndicator timeIndicator = new TimeIndicator();
+        timeIndicator.setPosition(new Point2D(-WINDOW_WIDTH/2, -WINDOW_HEIGHT/2));
+        timeIndicator.start();
+        game.setTimeIndicator(timeIndicator);
 
         for (int i = 0; i < ENEMY_COUNT; i++) {
             double angle = (double)i/ENEMY_COUNT*360;
@@ -60,7 +70,6 @@ public class HelloApplication extends Application {
         }
 
         game.getTransforms().add(new Translate(WINDOW_WIDTH/2, WINDOW_HEIGHT/2));
-
         new IntervalTimer() {
             @Override
             public void handleInterval(long interval) {
@@ -79,6 +88,33 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
+/*
+    @Override
+    public void start(Stage stage) throws IOException {
+        Group root = new Group();
+        Rectangle rect = new Rectangle(100, 200);
+        rect.setFill(Color.GREEN);
+        rect.setStrokeType(StrokeType.INSIDE);
+        rect.setStroke(Color.BLACK);
+        //rect.setTranslateY(300);
+        //rect.setTranslateX(300);
+        root.getChildren().add(rect);
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(10), rect);
+        scaleTransition.setFromX(1);
+        scaleTransition.setToX(0);
+        //scaleTransition.play();
+        System.out.println(rect.getLocalToParentTransform());
+        //rect.setScaleX(0.5);
+        rect.getTransforms().addAll(new Scale(0.5, 1));
+        System.out.println(rect.getBoundsInLocal());
+        System.out.println(rect.getLocalToParentTransform());
+
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.setFill(Color.YELLOW);
+        stage.setScene(scene);
+        stage.show();
+    }
+*/
     public static void main(String[] args) {
         launch();
     }
