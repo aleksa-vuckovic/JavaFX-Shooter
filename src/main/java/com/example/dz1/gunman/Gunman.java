@@ -20,19 +20,19 @@ import javafx.util.Duration;
 public abstract class Gunman extends Group {
     protected Rotate rotate = new Rotate();
     protected Translate position = new Translate();
-    protected final float radius;
     protected Body body;
     protected Gun gun;
     protected Game game;
     protected float speed;
     private Timeline triggerTimeline;
+    private Scale scale;
 
-    Gunman(Body body, Gun gun, float radius, Game game) {
+    Gunman(Body body, Gun gun, Game game) {
         this.body = body;
         this.gun = gun;
-        this.radius = radius;
         this.game = game;
         this.speed = 10;
+        this.scale = new Scale(1,1);
 
         Translate triggerTranslate = new Translate();
 
@@ -43,7 +43,11 @@ public abstract class Gunman extends Group {
         triggerTimeline = new Timeline(kf1, kf2);
 
         this.getChildren().addAll(body, gun);
-        this.getTransforms().addAll(position, rotate, new Scale(radius, radius), triggerTranslate);
+        this.getTransforms().addAll(position, rotate, scale, triggerTranslate);
+    }
+    public void setRadius(float radius) {
+        scale.setX(radius);
+        scale.setY(radius);
     }
 
     protected void trigger() {
@@ -61,7 +65,7 @@ public abstract class Gunman extends Group {
         return this.localToParent(0f, 0f);
     }
     public float getRadius() {
-        return this.radius;
+        return (float) scale.getX();
     }
 
     /**
@@ -89,25 +93,12 @@ public abstract class Gunman extends Group {
         return localToParent(body.getBoundsInLocal());
     }
 
-    /**
-     * Move the gunman by the amount specified.
-     * Will only move if the field bounds allow.
-     * @param amount The displacement vector.
-     */
-    public void moveBy(Point2D amount) {
-        this.position.setX(this.position.getX() + amount.getX()*speed);
-        this.position.setY(this.position.getY() + amount.getY()*speed);
-        if (!game.getField().isWithinBounds(this)) {
-            this.position.setX(this.position.getX() - amount.getX()*speed);
-            this.position.setY(this.position.getY() - amount.getY()*speed);
-        }
-    }
 
     /**
      * Move the gunman to the specified position.
      * @param position The position in game coordinates.
      */
-    public void moveTo(Point2D position) {
+    public void setPosition(Point2D position) {
         this.position.setX(position.getX());
         this.position.setY(position.getY());
     }
@@ -128,7 +119,10 @@ public abstract class Gunman extends Group {
      */
     public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
         Point2D bulletPosition = parentToLocal(bullet.getPosition());
-        float bulletRadius = bullet.getRadius() / radius;
+        float bulletRadius = bullet.getRadius() / getRadius();
         return body.intersectsCircle(bulletPosition, bulletRadius);
     }
+
+    public abstract void die();
+    public abstract void start();
 }

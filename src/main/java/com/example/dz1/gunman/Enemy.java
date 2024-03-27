@@ -22,20 +22,10 @@ public class Enemy extends Gunman {
     protected int lives;
 
 
-    public Enemy(Body body, Gun gun, float radius, int lives, float fireFrequency, Game game) {
-        super(body, gun, radius, game);
+    public Enemy(Body body, Gun gun, int lives, float fireFrequency, Game game) {
+        super(body, gun, game);
         this.fireFrequency = fireFrequency;
         this.maxLives = this.lives = lives;
-
-        this.fireTimer = new IntervalTimer() {
-            @Override
-            public void handleInterval(long interval) {
-                float probability = fireFrequency/1000 * interval;
-                if (Math.random() < probability) fire();
-            }
-        };
-        fireTimer.start();
-
     }
     public static Enemy regularEnemy(Game game) {
         Body body = new CircleBody();
@@ -43,7 +33,7 @@ public class Enemy extends Gunman {
         body.setStroke(Color.PURPLE);
         Gun gun = new ConeGun();
         gun.setFill(Color.PURPLE);
-        return new Enemy(body, gun, 20f, 4, 0.1f, game);
+        return new Enemy(body, gun, 4, 0.1f, game);
     }
 
     @Override
@@ -70,7 +60,23 @@ public class Enemy extends Gunman {
         super.trigger();
     }
 
+    @Override
     public void die() {
-        fireTimer.stop();
+        if (fireTimer != null) {
+            fireTimer.stop();
+            fireTimer = null;
+        }
+    }
+
+    @Override
+    public void start() {
+        this.fireTimer = new IntervalTimer() {
+            @Override
+            public void handleInterval(long interval) {
+                float probability = fireFrequency/1000 * interval;
+                if (Math.random() < probability) fire();
+            }
+        };
+        fireTimer.start();
     }
 }

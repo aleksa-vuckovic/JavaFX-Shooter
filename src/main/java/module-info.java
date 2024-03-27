@@ -13,4 +13,6 @@ module com.example.dz1 {
     opens com.example.dz1.gunman.gun to javafx.fxml;
     exports com.example.dz1.gunman.body;
     opens com.example.dz1.gunman.body to javafx.fxml;
+    exports com.example.dz1.ui;
+    opens com.example.dz1.ui to javafx.fxml;
 }

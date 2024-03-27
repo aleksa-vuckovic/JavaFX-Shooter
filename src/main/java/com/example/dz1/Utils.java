@@ -27,4 +27,9 @@ public class Utils {
     public static Color changeOpacity(Color color, float opacity) {
         return Color.color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
     }
+
+    public static float SPEED_SLOW = 0.2f;
+    public static float SPEED_MEDIUM = 0.4f;
+    public static float SPEED_FAST = 0.6f;
+    public static float SPEED_BULLET = 1f;
 }

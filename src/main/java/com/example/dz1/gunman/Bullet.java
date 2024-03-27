@@ -1,5 +1,6 @@
 package com.example.dz1.gunman;
 
+import com.example.dz1.Utils;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -39,14 +40,12 @@ public class Bullet extends Group {
         this.direction = direction.normalize();
     }
     public static Bullet regularBullet() {
-        return new Bullet(5f, 1, 1f, Color.BLACK);
+        return new Bullet(5f, 1, Utils.SPEED_BULLET, Color.BLACK);
     }
     public static Bullet slowBullet() {
-        return new Bullet(5f, 1, 0.2f, Color.BLACK);
+        return new Bullet(5f, 1, Utils.SPEED_SLOW, Color.BLACK);
     }
-    public static Bullet bigBullet() {
-        return new Bullet(10f, 2, 0.2f, Color.RED);
-    }
+    public static Bullet bigBullet() { return new Bullet(10f, 2, Utils.SPEED_SLOW, Color.RED);}
 
     public void timeUpdate(long interval) {
         Point2D move = direction.multiply(interval * speed);

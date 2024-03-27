@@ -1,6 +1,5 @@
 package com.example.dz1;
 
-import com.example.dz1.Wrapper;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Bullet;
 import com.example.dz1.gunman.Enemy;
@@ -11,6 +10,7 @@ import com.example.dz1.indicators.TimeIndicator;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -51,16 +51,23 @@ public class Game extends Group {
             else player.fire();
         }
     }
+    private Set<KeyCode> controls = new HashSet<>();
     public void onKeyEvent(KeyEvent keyEvent) {
         if (state != State.PLAYING) return;
-        switch (keyEvent.getCode()) {
-            case UP -> player.moveBy(new Point2D(0, -1));
-            case DOWN -> player.moveBy(new Point2D(0, 1));
-            case LEFT -> player.moveBy(new Point2D(-1, 0));
-            case RIGHT -> player.moveBy(new Point2D(1, 0));
+        if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) controls.add(keyEvent.getCode());
+        else if (keyEvent.getEventType() == KeyEvent.KEY_RELEASED) controls.remove(keyEvent.getCode());
+        Point2D direction = Point2D.ZERO;
+        for (KeyCode code: controls) {
+            switch (code) {
+                case UP -> direction = direction.add(new Point2D(0, -1));
+                case DOWN -> direction = direction.add(new Point2D(0, 1));
+                case LEFT -> direction = direction.add(new Point2D(-1, 0));
+                case RIGHT -> direction = direction.add(new Point2D(1, 0));
+            }
         }
+        direction = direction.normalize();
+        player.setDirection(direction);
         player.adjustRotate(mouse);
-        for (Enemy enemy: enemies) enemy.adjustRotate(player);
     }
 
     public Field getField() {
@@ -162,6 +169,7 @@ public class Game extends Group {
         state = State.OVER;
         for (Enemy enemy: enemies) enemy.die();
         timeIndicator.stop();
+        player.die();
         Text text = new Text("GAME OVER");
         text.setFont(Font.font("Arial", 70));
         text.setTranslateX(-text.getBoundsInLocal().getCenterX());
