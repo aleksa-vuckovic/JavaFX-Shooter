@@ -1,81 +1,79 @@
 package com.example.dz1;
 
+import com.example.dz1.field.Field;
+import com.example.dz1.gunman.Enemy;
+import com.example.dz1.gunman.Player;
+import com.example.dz1.indicators.TimeIndicator;
 import com.example.dz1.ui.Button;
 import com.example.dz1.ui.Selection;
+import com.example.dz1.ui.TextBox;
 import javafx.application.Application;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.lang.module.FindException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HelloApplication extends Application {
 
     private static final float WINDOW_WIDTH = 600f;
     private static final float WINDOW_HEIGHT = 600f;
-    private static final float PLAYER_RADIUS = 20f;
-    private static final int ENEMY_COUNT = 4;
+
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        Game game = new Game(WINDOW_WIDTH, WINDOW_HEIGHT);
+        game.getTransforms().add(new Translate(WINDOW_WIDTH/2, WINDOW_HEIGHT/2));
+        StartScreen startScreen = new StartScreen();
+        Scene startScene = new Scene(startScreen, WINDOW_WIDTH, WINDOW_HEIGHT);
+        startScene.setFill(Color.BLACK);
+        Scene gameScene = new Scene(game, WINDOW_WIDTH, WINDOW_HEIGHT);
+        gameScene.addEventHandler(KeyEvent.ANY, game::onKeyEvent);
+        gameScene.addEventHandler(MouseEvent.ANY, game::onMouseEvent);
+
+        startScreen.setOnStart(() -> {
+            Player player = startScreen.getPlayer();
+            Field field = startScreen.getField();
+            field.setDimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
+            String difficulty = startScreen.getDifficulty();
+            game.setField(field);
+            game.setPlayer(player);
+
+
+            for (int i = 0; i < field.getEnemyCount(); i++) {
+                Enemy enemy = Enemy.regularEnemy();
+                enemy.setPosition(field.getEnemyPosition(i));
+                game.addEnemy(enemy);
+            }
+
+            game.start();
+            stage.setScene(gameScene);
+            System.out.println("Started");
+        });
+
+        stage.setScene(startScene);
+        stage.setTitle("Shooter!");
+        stage.show();
+    }
 
 /*
     @Override
     public void start(Stage stage) throws IOException {
-        Game game = new Game(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        Field field = new CircleField(WINDOW_WIDTH/3);
-        Image grassImage = new Image("grass.jpg");
-        ImagePattern grassPattern = new ImagePattern(grassImage);
-        field.setFill(grassPattern);
-        game.setField(field);
-
-        Body playerBody = new HexagonBody();
-        playerBody.setFill(Color.YELLOW);
-        playerBody.setStroke(Color.PURPLE);
-        Gun playerGun = new RegularGun();
-        playerGun.setFill(Color.PURPLE);
-        Player player = new Player(playerBody, playerGun, PLAYER_RADIUS, 4, 4, Utils.SPEED_MEDIUM, game);
-        game.setPlayer(player);
-
-        TimeIndicator timeIndicator = new TimeIndicator();
-        timeIndicator.setPosition(new Point2D(-WINDOW_WIDTH/2, -WINDOW_HEIGHT/2));
-        timeIndicator.start();
-        game.setTimeIndicator(timeIndicator);
-
-        for (int i = 0; i < ENEMY_COUNT; i++) {
-            double angle = (double)i/ENEMY_COUNT*360;
-            Point2D position = new Rotate(angle).transform(WINDOW_WIDTH*5/12, 0);
-            Enemy enemy = Enemy.regularEnemy(game);
-            enemy.setPosition(position);
-            game.addEnemy(enemy);
-        }
-
-        game.getTransforms().add(new Translate(WINDOW_WIDTH/2, WINDOW_HEIGHT/2));
-        new IntervalTimer() {
-            @Override
-            public void handleInterval(long interval) {
-                game.timeUpdate(interval);
-            }
-        }.start();
-
-        Scene scene = new Scene(game, WINDOW_WIDTH, WINDOW_HEIGHT);
-        scene.addEventHandler(KeyEvent.ANY, game::onKeyEvent);
-        scene.addEventHandler(MouseEvent.ANY, game::onMouseEvent);
-        Image waterImage = new Image("water.jpg");
-        ImagePattern waterPattern = new ImagePattern(waterImage);
-        scene.setFill(waterPattern);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
-    }
-*/
-
-    @Override
-    public void start(Stage stage) throws IOException {
         Group root = new Group();
+
 
         Rectangle option1 = new Rectangle(50,50, Color.BLUE);
         Circle option2 = new Circle(30, Color.GREEN);
@@ -89,12 +87,19 @@ public class HelloApplication extends Application {
         button.setTranslateX(50);
         root.getChildren().addAll(button);
 
+
+
+        Field field = Field.starField(WINDOW_WIDTH,WINDOW_HEIGHT);
+        root.getChildren().addAll(field);
+        root.setTranslateX(WINDOW_HEIGHT/2);
+        root.setTranslateY(WINDOW_WIDTH/2);
+
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.BLACK);
         stage.setScene(scene);
         stage.show();
     }
-
+*/
     public static void main(String[] args) {
         launch();
     }

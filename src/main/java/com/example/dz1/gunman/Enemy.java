@@ -22,18 +22,20 @@ public class Enemy extends Gunman {
     protected int lives;
 
 
-    public Enemy(Body body, Gun gun, int lives, float fireFrequency, Game game) {
-        super(body, gun, game);
+    public Enemy(Body body, Gun gun, int lives, float fireFrequency) {
+        super(body, gun);
         this.fireFrequency = fireFrequency;
         this.maxLives = this.lives = lives;
     }
-    public static Enemy regularEnemy(Game game) {
+    public static Enemy regularEnemy() {
         Body body = new CircleBody();
         body.setFill(Color.RED);
         body.setStroke(Color.PURPLE);
         Gun gun = new ConeGun();
         gun.setFill(Color.PURPLE);
-        return new Enemy(body, gun, 4, 0.1f, game);
+        Enemy enemy = new Enemy(body, gun, 4, 0.1f);
+        enemy.setRadius(20f);
+        return enemy;
     }
 
     @Override
@@ -41,10 +43,7 @@ public class Enemy extends Gunman {
         if (!super.interact(bullet, onRemoveBullet, onRemoveGunman)) return false;
         onRemoveBullet.run();
         lives -= bullet.getDamage();
-         if (lives <= 0) {
-             onRemoveGunman.run();
-             fireTimer.stop();
-         }
+         if (lives <= 0) onRemoveGunman.run();
          else {
              Paint paint = body.getFill();
              if (paint instanceof Color color) {
@@ -61,7 +60,8 @@ public class Enemy extends Gunman {
     }
 
     @Override
-    public void die() {
+    public void finish() {
+        super.finish();
         if (fireTimer != null) {
             fireTimer.stop();
             fireTimer = null;
@@ -69,7 +69,8 @@ public class Enemy extends Gunman {
     }
 
     @Override
-    public void start() {
+    public void start(Game game) {
+        super.start(game);
         this.fireTimer = new IntervalTimer() {
             @Override
             public void handleInterval(long interval) {

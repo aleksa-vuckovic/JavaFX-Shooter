@@ -15,8 +15,9 @@ public class Selection<T extends Node> extends Group {
     T selected;
     Rectangle selectedFrame;
 
-    public Selection(List<T> options, double size, String title) {
-        double pad = size/10;
+    public Selection(List<T> options, double width, double height, String title) {
+        double size = Math.min(width, height);
+        double pad = size/8;
         Text titleText = new Text(title);
         titleText.setFont(Font.font("Arial", 30));
         titleText.setFill(Color.WHITE);
@@ -28,17 +29,17 @@ public class Selection<T extends Node> extends Group {
 
         for (int i = 0; i < options.size(); i++) {
             Group g = new Group();
-            Rectangle frame = new Rectangle(-size/2, -size/2, size, size);
+            Rectangle frame = new Rectangle(-width/2, -height/2, width, height);
             frame.setFill(Color.LIGHTGRAY);
-            frame.setArcWidth(size/10);
-            frame.setArcHeight(size/10);
+            frame.setArcWidth(width/10);
+            frame.setArcHeight(height/10);
             frame.setStrokeWidth(size/20);
-            frame.setStrokeType(StrokeType.INSIDE);
+            frame.setStrokeType(StrokeType.OUTSIDE);
             frame.setStroke(null);
             g.getChildren().addAll(frame, options.get(i));
 
-            g.setTranslateY(size/2 + optionsTranslateY);
-            g.setTranslateX(size/2 + pad + i*(size+pad));
+            g.setTranslateY(height/2 + optionsTranslateY);
+            g.setTranslateX(width/2 + pad + i*(width+pad));
             int finalI = i;
             g.setOnMouseClicked(mouseEvent -> {
                 select(options.get(finalI), frame);

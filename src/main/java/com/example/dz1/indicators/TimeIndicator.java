@@ -1,6 +1,7 @@
 package com.example.dz1.indicators;
 
 import com.example.dz1.IntervalTimer;
+import com.example.dz1.ui.TextBox;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -11,10 +12,7 @@ import javafx.scene.transform.Translate;
 import java.time.format.DateTimeFormatter;
 
 public class TimeIndicator extends Group {
-
-    private static float PAD = 10f;
-    private static float FONT_SIZE = 24f;
-    Text text;
+    TextBox text;
     private long time = 0;
     private boolean active = false;
     private AnimationTimer timer;
@@ -28,10 +26,7 @@ public class TimeIndicator extends Group {
     }
 
     public TimeIndicator() {
-        text = new Text("00:00");
-        text.setTranslateX(PAD);
-        text.setTranslateY(PAD + FONT_SIZE);
-        text.setFont(Font.font("Arial", FONT_SIZE)); // Set font size to 24
+        text = new TextBox("00:00", 10f, Font.font("Arial", 24f), 0f);
         getChildren().addAll(text);
         this.position = new Translate();
         getTransforms().addAll(this.position);
@@ -39,7 +34,7 @@ public class TimeIndicator extends Group {
             @Override
             public void handleInterval(long interval) {
                 time += interval;
-                text.setText(format(time));
+                text.setContent(format(time));
             }
         };
     }

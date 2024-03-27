@@ -27,10 +27,9 @@ public abstract class Gunman extends Group {
     private Timeline triggerTimeline;
     private Scale scale;
 
-    Gunman(Body body, Gun gun, Game game) {
+    Gunman(Body body, Gun gun) {
         this.body = body;
         this.gun = gun;
-        this.game = game;
         this.speed = 10;
         this.scale = new Scale(1,1);
 
@@ -123,6 +122,10 @@ public abstract class Gunman extends Group {
         return body.intersectsCircle(bulletPosition, bulletRadius);
     }
 
-    public abstract void die();
-    public abstract void start();
+    public void finish() {
+        this.game = null;
+    }
+    public void start(Game game) {
+        this.game = game;
+    }
 }

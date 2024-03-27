@@ -3,6 +3,8 @@ package com.example.dz1;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.transform.Rotate;
 
 public class Utils {
 
@@ -26,6 +28,11 @@ public class Utils {
 
     public static Color changeOpacity(Color color, float opacity) {
         return Color.color(color.getRed(), color.getGreen(), color.getBlue(), opacity);
+    }
+    public static Point2D getCirclePoint(int divisions, int i, double radius, double offset) {
+        double angle = 360.0*i/divisions;
+        angle += offset*360.0/divisions;
+        return new Rotate(angle).transform(radius, 0);
     }
 
     public static float SPEED_SLOW = 0.2f;
