@@ -27,13 +27,13 @@ public class Enemy extends Gunman {
         this.fireFrequency = fireFrequency;
         this.maxLives = this.lives = lives;
     }
-    public static Enemy regularEnemy() {
+    public static Enemy regularEnemy(int lives) {
         Body body = new CircleBody();
         body.setFill(Color.RED);
         body.setStroke(Color.PURPLE);
         Gun gun = new ConeGun();
         gun.setFill(Color.PURPLE);
-        Enemy enemy = new Enemy(body, gun, 4, 0.1f);
+        Enemy enemy = new Enemy(body, gun, lives, 0.1f);
         enemy.setRadius(20f);
         return enemy;
     }

@@ -47,21 +47,26 @@ public class HelloApplication extends Application {
         startScreen.setOnStart(() -> {
             Player player = startScreen.getPlayer();
             Field field = startScreen.getField();
-            field.setDimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
             String difficulty = startScreen.getDifficulty();
+            field.setDimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
             game.setField(field);
             game.setPlayer(player);
 
-
+            int lives = 4;
+            if (difficulty.equals("Medium")) lives = 8;
+            else if (difficulty.equals("Hard")) lives = 15;
             for (int i = 0; i < field.getEnemyCount(); i++) {
-                Enemy enemy = Enemy.regularEnemy();
+                Enemy enemy = Enemy.regularEnemy(lives);
                 enemy.setPosition(field.getEnemyPosition(i));
                 game.addEnemy(enemy);
             }
 
             game.start();
             stage.setScene(gameScene);
-            System.out.println("Started");
+        });
+        game.setOnBack(() -> {
+            stage.setScene(startScene);
+            game.clear();
         });
 
         stage.setScene(startScene);

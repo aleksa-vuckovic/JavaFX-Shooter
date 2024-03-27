@@ -1,5 +1,6 @@
 package com.example.dz1.ui;
 
+import com.example.dz1.Utils;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -77,7 +78,7 @@ public class TextBox extends Group {
         text.setFill(color);
         rect.setFill(background);
         double textWidth = text.getLayoutBounds().getWidth();
-        double textHeight = text.getLayoutBounds().getHeight();
+        double textHeight = Utils.getTextHeight(text);
         if (width == null) {
             rect.setWidth(textWidth + 2*pad);
             text.setTranslateX(pad);

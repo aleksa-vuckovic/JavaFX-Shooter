@@ -7,6 +7,7 @@ import com.example.dz1.gunman.Player;
 import com.example.dz1.indicators.BulletIndicator;
 import com.example.dz1.indicators.LivesIndicator;
 import com.example.dz1.indicators.TimeIndicator;
+import com.example.dz1.ui.Button;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -23,6 +24,7 @@ import java.util.*;
 
 public class Game extends Group {
 
+    private Runnable onBack;
     private Field field;
     private Player player;
     private List<Enemy> enemies = new ArrayList<>();
@@ -41,6 +43,9 @@ public class Game extends Group {
 
     public Game(float sceneWidth, float sceneHeight) {
         this.gameBounds = new Rectangle(-sceneWidth/2, -sceneHeight/2, sceneWidth, sceneHeight).getBoundsInLocal();
+    }
+    public void setOnBack(Runnable onBack) {
+        this.onBack = onBack;
     }
     public void onMouseEvent(MouseEvent mouseEvent) {
         if (state != State.PLAYING) return;
@@ -75,25 +80,15 @@ public class Game extends Group {
         return field;
     }
     public void setField(Field field) {
-        getChildren().remove(this.field);
         getChildren().add(field);
         this.field = field;
     }
     public void setPlayer(Player player) {
-        if (this.player != null) {
-            getChildren().remove(this.player);
-            getChildren().remove(this.player.getBulletIndicator());
-            getChildren().remove(this.player.getLivesIndicator());
-            this.player.finish();
-            getChildren().removeAll(bullets);
-            bullets.clear();
-        }
         BulletIndicator bulletIndicator = player.getBulletIndicator();
         bulletIndicator.setPosition(Utils.getUpperRight(gameBounds));
         LivesIndicator livesIndicator = player.getLivesIndicator();
         livesIndicator.setPosition(Utils.getLowerLeft(gameBounds));
         this.player = player;
-        player.start(this);
         this.getChildren().addAll(player, bulletIndicator, livesIndicator);
     }
     public List<Enemy> getEnemies() {
@@ -103,7 +98,6 @@ public class Game extends Group {
         this.getChildren().addAll(enemy);
         enemies.add(enemy);
         enemy.adjustRotate(player);
-        enemy.start(this);
     }
     public void addBullet(Bullet bullet) {
         this.getChildren().add(bullet);
@@ -158,15 +152,12 @@ public class Game extends Group {
             }
         };
         timer.start();
-
-        if (timeIndicator != null) {
-            getChildren().remove(timeIndicator);
-            timeIndicator = null;
-        }
         timeIndicator = new TimeIndicator();
         timeIndicator.setPosition(Utils.getUpperLeft(gameBounds));
         getChildren().addAll(timeIndicator);
         timeIndicator.start();
+        player.start(this);
+        for (Enemy enemy: enemies) enemy.start(this);
         state = State.PLAYING;
     }
     public void finish() {
@@ -178,13 +169,22 @@ public class Game extends Group {
         timer.stop();
         timer = null;
 
-        Text text = new Text("GAME OVER");
+        Text text = enemies.isEmpty() ? new Text("CONGRATULATIONS!") : new Text("GAME OVER");
         text.setFont(Font.font("Arial", 70));
         text.setTranslateX(-text.getBoundsInLocal().getCenterX());
         text.setTranslateY(-text.getBoundsInLocal().getCenterY());
         Rectangle cover = new Rectangle(gameBounds.getMinX(), gameBounds.getMinY(), gameBounds.getWidth(), gameBounds.getHeight());
         cover.setFill(Utils.changeOpacity(Color.WHITE, 0.5f));
-        getChildren().addAll(cover, text);
+        Button back = new Button("Back", onBack);
+        back.setTranslateY(gameBounds.getHeight()/4 - back.getBoundsInLocal().getHeight()/2);
+        back.setTranslateX(-back.getBoundsInLocal().getWidth()/2);
+        getChildren().addAll(cover, text, back);
+    }
+
+    public void clear() {
+        getChildren().clear();
+        field = null; player = null; timeIndicator = null;
+        enemies.clear(); bullets.clear();
     }
 
 }

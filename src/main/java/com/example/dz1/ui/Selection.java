@@ -1,5 +1,6 @@
 package com.example.dz1.ui;
 
+import com.example.dz1.Utils;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -21,7 +22,7 @@ public class Selection<T extends Node> extends Group {
         Text titleText = new Text(title);
         titleText.setFont(Font.font("Arial", 30));
         titleText.setFill(Color.WHITE);
-        double textHeight = titleText.getBoundsInLocal().getHeight();
+        double textHeight = Utils.getTextHeight(titleText);
         titleText.setTranslateY(pad + textHeight);
         titleText.setTranslateX(pad);
         getChildren().addAll(titleText);

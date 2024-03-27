@@ -4,6 +4,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
 public class Utils {
@@ -33,6 +34,10 @@ public class Utils {
         double angle = 360.0*i/divisions;
         angle += offset*360.0/divisions;
         return new Rotate(angle).transform(radius, 0);
+    }
+
+    public static double getTextHeight(Text text) {
+        return text.getBoundsInLocal().getHeight()*0.8;
     }
 
     public static float SPEED_SLOW = 0.2f;
