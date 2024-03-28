@@ -78,5 +78,7 @@ public abstract class Field extends Group {
     public int getEnemyCount() { return enemyCount; }
     public abstract Point2D getEnemyPosition(int i);
     public double getWidth() {return width;}
+
+    public abstract Point2D getRandomPlatformPoint();
 }
 

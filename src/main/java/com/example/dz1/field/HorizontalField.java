@@ -37,4 +37,13 @@ public class HorizontalField extends Field {
         Point2D pos = new Point2D(-getWidth()/2 + spacing*(i+1), (lower ? 1 : -1) * enemyDistance);
         return pos;
     }
+
+    @Override
+    public Point2D getRandomPlatformPoint() {
+        double x = Math.random()*getWidth();
+        x -= getWidth()/2;
+        double y = Math.random()*platformHeight;
+        y -= platformHeight/2;
+        return new Point2D(x, y);
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.dz1;
 
+import com.example.dz1.collectible.CoinCollectible;
+import com.example.dz1.collectible.HeartCollectible;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Enemy;
 import com.example.dz1.gunman.Player;
@@ -65,6 +67,7 @@ public class HelloApplication extends Application {
             stage.setScene(gameScene);
         });
         game.setOnBack(() -> {
+            startScene.setRoot(new StartScreen());
             stage.setScene(startScene);
             game.clear();
         });
@@ -79,26 +82,9 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         Group root = new Group();
 
-
-        Rectangle option1 = new Rectangle(50,50, Color.BLUE);
-        Circle option2 = new Circle(30, Color.GREEN);
-        ArrayList<Node> options = new ArrayList<>();
-        options.add(option1); options.add(option2);
-        Selection<Node> selection = new Selection<>(options, 100, "Select this:");
-        root.getChildren().addAll(selection);
-
-        Button button = new Button("Ok", () -> {});
-        button.setTranslateY(250);
-        button.setTranslateX(50);
-        root.getChildren().addAll(button);
-
-
-
-        Field field = Field.starField(WINDOW_WIDTH,WINDOW_HEIGHT);
-        root.getChildren().addAll(field);
-        root.setTranslateX(WINDOW_HEIGHT/2);
-        root.setTranslateY(WINDOW_WIDTH/2);
-
+        HeartCollectible coin = new HeartCollectible();
+        coin.setPosition(new Point2D(100, 100));
+        root.getChildren().addAll(coin);
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.BLACK);
         stage.setScene(scene);

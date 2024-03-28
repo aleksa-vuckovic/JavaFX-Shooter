@@ -1,5 +1,8 @@
 package com.example.dz1;
 
+import com.example.dz1.collectible.CoinCollectible;
+import com.example.dz1.collectible.Collectible;
+import com.example.dz1.collectible.HeartCollectible;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Bullet;
 import com.example.dz1.gunman.Enemy;
@@ -24,11 +27,17 @@ import java.util.*;
 
 public class Game extends Group {
 
+    private static double COLLECTIBLE_PROBABILITY = 0.1;
+    private static double COIN_PROBABILITY = 0;
+    private static double SHIELD_PROBABILITY = 0;
+    private static final double HEART_PROBABILITY = 1;
+
     private Runnable onBack;
     private Field field;
     private Player player;
     private List<Enemy> enemies = new ArrayList<>();
     private List<Bullet> bullets = new LinkedList<>();
+    private List<Collectible> collectibles = new ArrayList<Collectible>();
 
     private Bounds gameBounds;
     private TimeIndicator timeIndicator;
@@ -74,6 +83,17 @@ public class Game extends Group {
         direction = direction.normalize();
         player.setDirection(direction);
         player.adjustRotate(mouse);
+        //Checking collectibles
+        Iterator<Collectible> collectibleIter = collectibles.iterator();
+        while (collectibleIter.hasNext()) {
+            Collectible cur = collectibleIter.next();
+            if (player.interacts(cur.getPosition())) {
+                cur.collect(player, () -> {
+                    getChildren().remove(cur);
+                });
+                collectibleIter.remove();
+            }
+        }
     }
 
     public Field getField() {
@@ -114,34 +134,50 @@ public class Game extends Group {
 
     public void timeUpdate(long interval) {
         if (state != State.PLAYING) return;
+        //Checking bullet hits
         Iterator<Bullet> bulletIter = bullets.iterator();
-        while (bulletIter.hasNext()) {
+        outer: while (bulletIter.hasNext()) {
             Bullet bullet = bulletIter.next();
             bullet.timeUpdate(interval);
             if (isOutside(bullet.getBoundsInParent())) {
                 bulletIter.remove();
-                this.getChildren().remove(bullet);
+                getChildren().remove(bullet);
+                continue;
             }
-            else {
-                Iterator<Enemy> enemyIter = enemies.iterator();
-                Wrapper<Boolean> removed = new Wrapper<>(false);
-                Runnable bulletRemover = () -> {
-                    bulletIter.remove();
-                    getChildren().remove(bullet);
-                    removed.value = true;
-                };
-                while(enemyIter.hasNext()) {
-                    Enemy enemy = enemyIter.next();
-                    enemy.interact(bullet, bulletRemover, () -> {
+            Iterator<Enemy> enemyIter = enemies.iterator();
+            while(enemyIter.hasNext()) {
+                Enemy enemy = enemyIter.next();
+                if (enemy.interacts(bullet)) {
+                    enemy.take(bullet, () -> {
                         enemyIter.remove();
                         getChildren().remove(enemy);
                         enemy.finish();
                     });
-                    if (removed.value) break;
+                    bulletIter.remove();
+                    getChildren().remove(bullet);
+                    continue outer;
                 }
-                if (!removed.value) player.interact(bullet, bulletRemover, this::finish);
+            }
+            if (player.interacts(bullet)) {
+                player.take(bullet, this::finish);
+                bulletIter.remove();
+                getChildren().remove(bullet);
             }
         }
+        if (enemies.isEmpty()) finish();
+        //Generating collectibles
+        if (Math.random() < COLLECTIBLE_PROBABILITY/1000*interval) {
+            Collectible collectible;
+            double rand = Math.random();
+            if (rand < COIN_PROBABILITY) collectible = new CoinCollectible();
+            else if (rand < COIN_PROBABILITY + HEART_PROBABILITY) collectible = new HeartCollectible();
+            else collectible = new HeartCollectible();
+            Point2D location = field.getRandomPlatformPoint();
+            collectible.setPosition(location);
+            collectibles.add(collectible);
+            getChildren().add(1, collectible);
+        }
+
     }
 
     public void start() {
@@ -184,7 +220,7 @@ public class Game extends Group {
     public void clear() {
         getChildren().clear();
         field = null; player = null; timeIndicator = null;
-        enemies.clear(); bullets.clear();
+        enemies.clear(); bullets.clear(); collectibles.clear();
     }
 
 }

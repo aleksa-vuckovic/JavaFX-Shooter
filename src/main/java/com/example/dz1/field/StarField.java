@@ -44,4 +44,10 @@ public class StarField extends Field {
     public void setEnemyCount(int count) {}
     @Override
     public int getEnemyCount() {return POINTS;}
+
+    @Override
+    public Point2D getRandomPlatformPoint() {
+        int point = (int)(Math.random()*POINTS);
+        return Utils.getCirclePoint(POINTS, point, (innerRadius + outerRadius)/2, 0.5);
+    }
 }

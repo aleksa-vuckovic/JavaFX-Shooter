@@ -74,12 +74,9 @@ public class Player extends Gunman {
     }
 
     @Override
-    public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
-        if (!super.interact(bullet, onRemoveBullet, onRemoveGunman)) return false;
-        onRemoveBullet.run();
+    public void take(Bullet bullet, Runnable onRemoveGunman) {
         livesIndicator.set(livesIndicator.get() - bullet.getDamage());
         if (livesIndicator.dead()) onRemoveGunman.run();
-        return true;
     }
 
 

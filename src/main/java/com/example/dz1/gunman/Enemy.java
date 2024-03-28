@@ -39,9 +39,7 @@ public class Enemy extends Gunman {
     }
 
     @Override
-    public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
-        if (!super.interact(bullet, onRemoveBullet, onRemoveGunman)) return false;
-        onRemoveBullet.run();
+    public void take(Bullet bullet, Runnable onRemoveGunman) {
         lives -= bullet.getDamage();
          if (lives <= 0) onRemoveGunman.run();
          else {
@@ -50,7 +48,6 @@ public class Enemy extends Gunman {
                  body.setFill(Utils.changeOpacity(color,lives/(float)maxLives));
              }
          }
-        return true;
     }
 
     @Override

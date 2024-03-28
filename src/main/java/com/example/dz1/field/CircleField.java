@@ -35,4 +35,11 @@ public class CircleField extends Field {
         return new Rotate(angle).transform(enemyRadius, 0);
     }
 
+    @Override
+    public Point2D getRandomPlatformPoint() {
+        double a = Math.random()*360;
+        double r = Math.random()*radius;
+        return new Rotate(a).transform(r, 0);
+    }
+
 }

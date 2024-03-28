@@ -73,6 +73,7 @@ public abstract class Gunman extends Group {
      */
     public void adjustRotate(Point2D target) {
         Point2D direction = target.subtract(this.getCenter());
+        if (direction.equals(Point2D.ZERO)) return;
         double angle = direction.angle(1,0);
         if (direction.getY() < 0) angle = -angle;
         this.rotate.setAngle(angle);
@@ -110,13 +111,9 @@ public abstract class Gunman extends Group {
     }
     public abstract void fire();
 
-    /**
-     * The base method checks for interaction.
-     * Overriding methods are expected to add specific behaviour
-     * if the base method returns true.
-     * @return True if an interaction occurred.
-     */
-    public boolean interact(Bullet bullet, Runnable onRemoveBullet, Runnable onRemoveGunman) {
+    public abstract void take(Bullet bullet, Runnable onRemoveGunman);
+    public final boolean interacts(Point2D point) {return body.contains(parentToLocal(point));}
+    public final boolean interacts(Bullet bullet) {
         Point2D bulletPosition = parentToLocal(bullet.getPosition());
         float bulletRadius = bullet.getRadius() / getRadius();
         return body.intersectsCircle(bulletPosition, bulletRadius);
