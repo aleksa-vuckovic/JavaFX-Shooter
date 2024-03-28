@@ -19,9 +19,24 @@ public class StartScreen extends Group {
     private Selection fieldSelection;
     private Selection difficultySelection;
     private Button start;
+    private Runnable onStart;
 
-    public StartScreen() {
+    public StartScreen() {}
+
+    public Player getPlayer() {
+        return (Player) playerSelection.getSelected();
+    }
+    public Field getField() {
+        return (Field) fieldSelection.getSelected();
+    }
+    public String getDifficulty() {
+        return ((TextBox)difficultySelection.getSelected()).getContent();
+    }
+    public void setOnStart(Runnable onStart) {this.onStart = onStart;}
+
+    public void reset() {
         final double w = 100;
+        getChildren().clear();
 
         Player player1 = Player.regular();
         Player player2 = Player.slow();
@@ -55,26 +70,13 @@ public class StartScreen extends Group {
         }
         difficultySelection = new Selection(options, 100, 50, "Select difficulty:");
 
-        start = new Button("Start", null);
+        start = new Button("Start", onStart);
 
         getChildren().addAll(playerSelection, fieldSelection, difficultySelection, start);
         fieldSelection.setTranslateY(w*1.5);
         difficultySelection.setTranslateY(w*3.2);
         start.setTranslateY(4.5*w);
         start.setTranslateX(20);
-    }
-
-    public Player getPlayer() {
-        return (Player) playerSelection.getSelected();
-    }
-    public Field getField() {
-        return (Field) fieldSelection.getSelected();
-    }
-    public String getDifficulty() {
-        return ((TextBox)difficultySelection.getSelected()).getContent();
-    }
-    public void setOnStart(Runnable onStart) {
-        start.setOnClick(onStart);
     }
 
 }

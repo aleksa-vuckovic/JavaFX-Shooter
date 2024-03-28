@@ -77,6 +77,12 @@ public abstract class Field extends Group {
     public void setEnemyCount(int count) { this.enemyCount = count; }
     public int getEnemyCount() { return enemyCount; }
     public abstract Point2D getEnemyPosition(int i);
+    public abstract Point2D getBarrierPosition(int i);
+
+    /**
+     * @return The direction of the barrier as a vector perpendicular to the barrier.
+     */
+    public abstract double getBarrierAngle(int i);
     public double getWidth() {return width;}
 
     public abstract Point2D getRandomPlatformPoint();

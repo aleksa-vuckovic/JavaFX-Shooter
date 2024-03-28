@@ -8,6 +8,7 @@ public class HorizontalField extends Field {
 
     private double platformHeight;
     private double enemyDistance;
+    private double barrierDistance;
     public HorizontalField() {
         shape = new Rectangle();
         this.getChildren().addAll(shape);
@@ -18,6 +19,7 @@ public class HorizontalField extends Field {
         super.setDimensions(width, height);
         this.platformHeight = height*0.5;
         this.enemyDistance = height*0.4;
+        this.barrierDistance = height*0.33;
         Rectangle rect = (Rectangle)shape;
         rect.setX(-width/2);
         rect.setY(-platformHeight/2);
@@ -46,4 +48,17 @@ public class HorizontalField extends Field {
         y -= platformHeight/2;
         return new Point2D(x, y);
     }
+
+    @Override
+    public Point2D getBarrierPosition(int i) {
+        Point2D position = getEnemyPosition(i);
+        return new Point2D(position.getX(), ((position.getY() < 0) ? -1 : 1)*barrierDistance);
+    }
+
+    @Override
+    public double getBarrierAngle(int i) {
+        return 90;
+    }
+
+
 }

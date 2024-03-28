@@ -3,6 +3,7 @@ package com.example.dz1.gunman;
 import com.example.dz1.Game;
 import com.example.dz1.IntervalTimer;
 import com.example.dz1.Utils;
+import com.example.dz1.collectible.Collectible;
 import com.example.dz1.gunman.body.Body;
 import com.example.dz1.gunman.body.HexagonBody;
 import com.example.dz1.gunman.body.SquareBody;
@@ -15,6 +16,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+
+import java.util.Iterator;
 
 public class Player extends Gunman {
 
@@ -116,7 +119,6 @@ public class Player extends Gunman {
 
     @Override
     public void finish() {
-        super.finish();
         if (this.timer != null) {
             this.timer.stop();
             this.timer = null;
@@ -126,7 +128,7 @@ public class Player extends Gunman {
     @Override
     public void start(Game game) {
         super.start(game);
-        this.timer = new IntervalTimer() {
+        timer = new IntervalTimer() {
             @Override
             public void handleInterval(long interval) {
                 if (!direction.equals(Point2D.ZERO)) {
@@ -140,9 +142,17 @@ public class Player extends Gunman {
                         shield = null;
                     }
                 }
+                Iterator<Collectible> collectibleIter = game.getCollectibles();
+                while (collectibleIter.hasNext()) {
+                    Collectible cur = collectibleIter.next();
+                    if (interacts(cur.getPosition())) {
+                        cur.collect(Player.this, () -> game.removeCollectible(cur));
+                        collectibleIter.remove();
+                    }
+                }
             }
         };
-        this.timer.start();
+        timer.start();
     }
 
     public void setShield() {

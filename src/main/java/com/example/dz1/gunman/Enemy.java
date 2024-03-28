@@ -45,7 +45,7 @@ public class Enemy extends Gunman {
          else {
              Paint paint = body.getFill();
              if (paint instanceof Color color) {
-                 body.setFill(Utils.changeOpacity(color,lives/(float)maxLives));
+                 body.setFill(Utils.changeOpacity(color,0.3f + lives/(float)maxLives*0.7f));
              }
          }
     }
@@ -58,7 +58,6 @@ public class Enemy extends Gunman {
 
     @Override
     public void finish() {
-        super.finish();
         if (fireTimer != null) {
             fireTimer.stop();
             fireTimer = null;

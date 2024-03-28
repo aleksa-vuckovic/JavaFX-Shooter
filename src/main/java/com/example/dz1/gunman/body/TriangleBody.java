@@ -16,7 +16,7 @@ public class TriangleBody extends Body {
     }
     public TriangleBody() {
 
-        shape = getEquiTri(1);
+        shape = getEquiTri(1f);
         getChildren().add(shape);
     }
 

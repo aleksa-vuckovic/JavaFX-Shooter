@@ -121,9 +121,7 @@ public abstract class Gunman extends Group {
         return body.intersectsCircle(bulletPosition, bulletRadius);
     }
 
-    public void finish() {
-        this.game = null;
-    }
+    public abstract void finish();
     public void start(Game game) {
         this.game = game;
     }

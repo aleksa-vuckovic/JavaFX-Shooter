@@ -1,35 +1,21 @@
 package com.example.dz1;
 
-import com.example.dz1.collectible.CoinCollectible;
-import com.example.dz1.collectible.HeartCollectible;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Enemy;
 import com.example.dz1.gunman.Player;
-import com.example.dz1.indicators.TimeIndicator;
-import com.example.dz1.ui.Button;
-import com.example.dz1.ui.Selection;
-import com.example.dz1.ui.TextBox;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.lang.module.FindException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class HelloApplication extends Application {
+public class Main extends Application {
 
     private static final float WINDOW_WIDTH = 600f;
     private static final float WINDOW_HEIGHT = 600f;
@@ -67,11 +53,13 @@ public class HelloApplication extends Application {
             stage.setScene(gameScene);
         });
         game.setOnBack(() -> {
-            startScene.setRoot(new StartScreen());
-            stage.setScene(startScene);
             game.clear();
+            startScreen.reset();
+            stage.setScene(startScene);
+
         });
 
+        startScreen.reset();
         stage.setScene(startScene);
         stage.setTitle("Shooter!");
         stage.show();
@@ -82,11 +70,14 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         Group root = new Group();
 
-        HeartCollectible coin = new HeartCollectible();
-        coin.setPosition(new Point2D(100, 100));
-        root.getChildren().addAll(coin);
+        Barrier barrier = new Barrier(5000);
+        barrier.setOnRemove(() -> {root.getChildren().remove(barrier);});
+        barrier.start();
+        barrier.setPosition(new Point2D(100, 100));
+        barrier.setAngle(60);
+        root.getChildren().addAll(barrier);
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-        scene.setFill(Color.BLACK);
+        scene.setFill(Color.WHITE);
         stage.setScene(scene);
         stage.show();
     }

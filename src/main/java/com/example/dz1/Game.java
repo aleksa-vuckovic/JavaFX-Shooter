@@ -32,13 +32,16 @@ public class Game extends Group {
     private static double COIN_PROBABILITY = 0.4;
     private static double SHIELD_PROBABILITY = 0.2;
     private static final double HEART_PROBABILITY = 0.4;
+    private static final double BARRIER_PROBABILITY = 0.3;
+    private static final long BARRIER_DURATION = 5000;
 
     private Runnable onBack;
     private Field field;
     private Player player;
     private List<Enemy> enemies = new ArrayList<>();
     private List<Bullet> bullets = new LinkedList<>();
-    private List<Collectible> collectibles = new ArrayList<Collectible>();
+    private List<Collectible> collectibles = new ArrayList<>();
+    private List<Barrier> barriers = new ArrayList<>();
 
     private Bounds gameBounds;
     private TimeIndicator timeIndicator;
@@ -84,17 +87,13 @@ public class Game extends Group {
         direction = direction.normalize();
         player.setDirection(direction);
         player.adjustRotate(mouse);
-        //Checking collectibles
-        Iterator<Collectible> collectibleIter = collectibles.iterator();
-        while (collectibleIter.hasNext()) {
-            Collectible cur = collectibleIter.next();
-            if (player.interacts(cur.getPosition())) {
-                cur.collect(player, () -> {
-                    getChildren().remove(cur);
-                });
-                collectibleIter.remove();
-            }
-        }
+    }
+
+    public Iterator<Collectible> getCollectibles() {
+        return collectibles.iterator();
+    }
+    public void removeCollectible(Collectible collectible) {
+        getChildren().remove(collectible);
     }
 
     public Field getField() {
@@ -163,6 +162,15 @@ public class Game extends Group {
                 player.take(bullet, this::finish);
                 bulletIter.remove();
                 getChildren().remove(bullet);
+                continue;
+            }
+            if (bullet.getOwner() instanceof Player) {
+                for (Barrier barrier: barriers)
+                    if (barrier.interacts(bullet)) {
+                        bulletIter.remove();
+                        getChildren().remove(bullet);
+                        continue outer;
+                    }
             }
         }
         if (enemies.isEmpty()) finish();
@@ -177,6 +185,20 @@ public class Game extends Group {
             collectible.setPosition(location);
             collectibles.add(collectible);
             getChildren().add(1, collectible);
+        }
+        //Generating barriers
+        if (Math.random() < BARRIER_PROBABILITY/1000*interval) {
+            Barrier barrier = new Barrier(BARRIER_DURATION);
+            barrier.setOnRemove(() -> {
+                getChildren().remove(barrier);
+                barriers.remove(barrier);
+            });
+            int i = (int)(Math.random() * field.getEnemyCount());
+            barrier.setPosition(field.getBarrierPosition(i));
+            barrier.setAngle(field.getBarrierAngle(i));
+            getChildren().add(1,barrier);
+            barriers.add(barrier);
+            barrier.start();
         }
 
     }
@@ -206,7 +228,7 @@ public class Game extends Group {
         timer.stop();
         timer = null;
 
-        Text text = enemies.isEmpty() ? new Text("CONGRATULATIONS!") : new Text("GAME OVER");
+        Text text = enemies.isEmpty() ? new Text("BRAVO!") : new Text("GAME OVER");
         text.setFont(Font.font("Arial", 70));
         text.setTranslateX(-text.getBoundsInLocal().getCenterX());
         text.setTranslateY(-text.getBoundsInLocal().getCenterY());

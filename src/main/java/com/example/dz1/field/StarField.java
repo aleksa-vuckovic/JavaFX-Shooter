@@ -13,6 +13,7 @@ public class StarField extends Field {
     private double innerRadius;
     private double outerRadius;
     private double enemyRadius;
+    private double barrierRadius;
     public StarField() {
         shape = new Polygon();
         this.getChildren().addAll(shape);
@@ -24,6 +25,7 @@ public class StarField extends Field {
         this.innerRadius = size*0.2;
         this.outerRadius = size*0.4;
         this.enemyRadius = size*0.4;
+        this.barrierRadius = size*0.33;
         Polygon star = (Polygon) shape;
         star.getPoints().clear();
         for (int i = 0; i < POINTS; i++) {
@@ -35,9 +37,7 @@ public class StarField extends Field {
 
     @Override
     public Point2D getEnemyPosition(int i) {
-        int count = getEnemyCount();
-        double angle = (double)i/count*360;
-        return new Rotate(angle).transform(enemyRadius, 0);
+        return Utils.getCirclePoint(getEnemyCount(), i, enemyRadius, 0);
     }
 
     @Override
@@ -49,5 +49,15 @@ public class StarField extends Field {
     public Point2D getRandomPlatformPoint() {
         int point = (int)(Math.random()*POINTS);
         return Utils.getCirclePoint(POINTS, point, (innerRadius + outerRadius)/2, 0.5);
+    }
+
+    @Override
+    public Point2D getBarrierPosition(int i) {
+        return Utils.getCirclePoint(getEnemyCount(), i, barrierRadius, 0);
+    }
+
+    @Override
+    public double getBarrierAngle(int i) {
+        return (double)i/getEnemyCount()*360;
     }
 }

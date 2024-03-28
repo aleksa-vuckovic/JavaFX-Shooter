@@ -14,6 +14,7 @@ public class CircleField extends Field {
 
     private double radius;
     private double enemyRadius;
+    private double barrierRadius;
     public CircleField() {
         shape = new Circle();
         this.getChildren().addAll(shape);
@@ -25,6 +26,7 @@ public class CircleField extends Field {
         double size = Math.min(width, height);
         this.radius = size*0.3;
         this.enemyRadius = size*0.45;
+        this.barrierRadius = size*0.38;
         ((Circle)shape).setRadius(radius);
     }
 
@@ -42,4 +44,15 @@ public class CircleField extends Field {
         return new Rotate(a).transform(r, 0);
     }
 
+    @Override
+    public Point2D getBarrierPosition(int i) {
+        int count = getEnemyCount();
+        double angle = (double)i/count*360;
+        return new Rotate(angle).transform(barrierRadius, 0);
+    }
+
+    @Override
+    public double getBarrierAngle(int i) {
+        return (double) i / getEnemyCount() * 360;
+    }
 }
