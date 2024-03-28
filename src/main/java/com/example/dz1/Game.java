@@ -3,6 +3,7 @@ package com.example.dz1;
 import com.example.dz1.collectible.CoinCollectible;
 import com.example.dz1.collectible.Collectible;
 import com.example.dz1.collectible.HeartCollectible;
+import com.example.dz1.collectible.ShieldCollectible;
 import com.example.dz1.field.Field;
 import com.example.dz1.gunman.Bullet;
 import com.example.dz1.gunman.Enemy;
@@ -28,9 +29,9 @@ import java.util.*;
 public class Game extends Group {
 
     private static double COLLECTIBLE_PROBABILITY = 0.1;
-    private static double COIN_PROBABILITY = 0;
-    private static double SHIELD_PROBABILITY = 0;
-    private static final double HEART_PROBABILITY = 1;
+    private static double COIN_PROBABILITY = 0.4;
+    private static double SHIELD_PROBABILITY = 0.2;
+    private static final double HEART_PROBABILITY = 0.4;
 
     private Runnable onBack;
     private Field field;
@@ -171,7 +172,7 @@ public class Game extends Group {
             double rand = Math.random();
             if (rand < COIN_PROBABILITY) collectible = new CoinCollectible();
             else if (rand < COIN_PROBABILITY + HEART_PROBABILITY) collectible = new HeartCollectible();
-            else collectible = new HeartCollectible();
+            else collectible = new ShieldCollectible();
             Point2D location = field.getRandomPlatformPoint();
             collectible.setPosition(location);
             collectibles.add(collectible);

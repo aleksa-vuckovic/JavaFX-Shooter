@@ -9,16 +9,7 @@ import javafx.scene.shape.Polygon;
 public class HexagonBody extends Body {
 
     public HexagonBody() {
-        float t = 1f/2;
-        float h = (float)Math.sqrt(3)/2;
-        shape = new Polygon(
-                t, -h,
-                1f, 0f,
-                t, h,
-                -t, h,
-                -1f, 0f,
-                -t, -h
-        );
+        shape = Utils.getHexagon(1);
         this.getChildren().addAll(shape);
     }
 

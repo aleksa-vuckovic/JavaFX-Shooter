@@ -107,6 +107,7 @@ public abstract class Gunman extends Group {
     protected final void fireBullet(Bullet bullet) {
         bullet.setDirection(rotate.transform(1, 0));
         bullet.setPosition(localToParent(this.gun.getTop()));
+        bullet.setOwner(this);
         game.addBullet(bullet);
     }
     public abstract void fire();
@@ -114,6 +115,7 @@ public abstract class Gunman extends Group {
     public abstract void take(Bullet bullet, Runnable onRemoveGunman);
     public final boolean interacts(Point2D point) {return body.contains(parentToLocal(point));}
     public final boolean interacts(Bullet bullet) {
+        if (bullet.getOwner() == this) return false;
         Point2D bulletPosition = parentToLocal(bullet.getPosition());
         float bulletRadius = bullet.getRadius() / getRadius();
         return body.intersectsCircle(bulletPosition, bulletRadius);

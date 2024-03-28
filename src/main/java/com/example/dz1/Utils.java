@@ -40,6 +40,19 @@ public class Utils {
         return text.getBoundsInLocal().getHeight()*0.8;
     }
 
+    public static Polygon getHexagon(double radius) {
+        double t = radius/2;
+        double h = radius*Math.sqrt(3)/2;
+        return new Polygon(
+                t, -h,
+                radius, 0f,
+                t, h,
+                -t, h,
+                -radius, 0f,
+                -t, -h
+        );
+    }
+
     public static float SPEED_SLOW = 0.2f;
     public static float SPEED_MEDIUM = 0.4f;
     public static float SPEED_FAST = 0.6f;

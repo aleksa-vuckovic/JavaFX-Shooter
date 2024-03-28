@@ -15,6 +15,7 @@ public class Bullet extends Group {
     private Circle circle;
     private Translate position;
     private Point2D direction;
+    private Gunman owner;
     /**
      * Bullet speed in pixels per millisecond.
      */
@@ -32,6 +33,10 @@ public class Bullet extends Group {
         this.getChildren().addAll(circle);
         this.getTransforms().add(this.position);
     }
+    public void setOwner(Gunman gunman) {
+        this.owner = gunman;
+    }
+    public Gunman getOwner() { return owner; }
     public void setPosition(Point2D position) {
         this.position.setX(position.getX());
         this.position.setY(position.getY());

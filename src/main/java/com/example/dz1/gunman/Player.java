@@ -13,8 +13,12 @@ import com.example.dz1.indicators.BulletIndicator;
 import com.example.dz1.indicators.LivesIndicator;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 
 public class Player extends Gunman {
+
+    private static long SHIELD_TIME = 10000;
 
     /**
      * The speed in pixels per millisecond.
@@ -22,9 +26,11 @@ public class Player extends Gunman {
     private float speed;
     private BulletIndicator bulletIndicator;
     private LivesIndicator livesIndicator;
+    private Circle shield;
+    private long shieldLeft;
     private Point2D direction = Point2D.ZERO;
 
-    private IntervalTimer moveTimer;
+    private IntervalTimer timer;
 
 
     public Player(Body body, Gun gun, int lives, int bigBullets, float speed) {
@@ -75,6 +81,7 @@ public class Player extends Gunman {
 
     @Override
     public void take(Bullet bullet, Runnable onRemoveGunman) {
+        if (shield != null) return;
         livesIndicator.set(livesIndicator.get() - bullet.getDamage());
         if (livesIndicator.dead()) onRemoveGunman.run();
     }
@@ -110,24 +117,42 @@ public class Player extends Gunman {
     @Override
     public void finish() {
         super.finish();
-        if (this.moveTimer != null) {
-            this.moveTimer.stop();
-            this.moveTimer = null;
+        if (this.timer != null) {
+            this.timer.stop();
+            this.timer = null;
         }
     }
 
     @Override
     public void start(Game game) {
         super.start(game);
-        this.moveTimer = new IntervalTimer() {
+        this.timer = new IntervalTimer() {
             @Override
             public void handleInterval(long interval) {
-                if (direction.equals(Point2D.ZERO)) return;
-                Point2D amount = direction.multiply(interval*speed);
-                if (moveBy(amount)) for (Enemy enemy: game.getEnemies()) enemy.adjustRotate(Player.this);
+                if (!direction.equals(Point2D.ZERO)) {
+                    Point2D amount = direction.multiply(interval*speed);
+                    if (moveBy(amount)) for (Enemy enemy: game.getEnemies()) enemy.adjustRotate(Player.this);
+                }
+                if (shield != null) {
+                    shieldLeft -= interval;
+                    if (shieldLeft <= 0) {
+                        getChildren().remove(shield);
+                        shield = null;
+                    }
+                }
             }
         };
-        this.moveTimer.start();
+        this.timer.start();
+    }
+
+    public void setShield() {
+        if (this.shield != null) return;
+        shield = new Circle(1.1);
+        shield.setFill(Utils.changeOpacity(Color.STEELBLUE, 0.5f));
+        shield.setStroke(Utils.changeOpacity(Color.LIGHTBLUE, 0.5f));
+        shield.setStrokeWidth(0.05f);
+        getChildren().add(shield);
+        shieldLeft = SHIELD_TIME;
     }
 
 }
